@@ -1,7 +1,7 @@
 .data
 	menu: .asciiz "\n1. Farenheit -> Celsius \n2. Fibonacci\n3. Enesimo par\n4. Sair\n\nDigite a opcao: "
 	farenheit_menu: .asciiz "\nDigite a temperatura em farenheit: "
-	fibonacci_menu: .asciiz "\nDigite o valor de N: "
+	fibonacci_menu: .asciiz "\nDigite o valor de N (sendo N > 0): "
 	par_menu: .asciiz "\nDigite um numero para saber seu enesimo par: "
 	resultado: .asciiz "Resultado: "
 	pula_linha: .asciiz "\n"
@@ -82,9 +82,34 @@ fibonacci:
 	# Lendo o inteiro de N
 	li $v0, 5
 	syscall
-	move $t1, $v0
+	move $t1, $v0 # Armazenando em $t1
 	
-	j main
+	li $t7, 1 # Inializando um contador com 1
+	li $t2, 0 # Definindo $t2 como F(0) = 0
+	li $t3, 1 # Definindo $t3 como F(1) = 1
+
+	fibonacci_calc:
+		beq $t7, $t1, fibonacci_result # Se o contador chegar a N ($t7 == N) pula para fibonacci_result 
+		move $t4, $t3 # Armazena o valor de F(N-1) em $t4
+		add $t3, $t3, $t2 # Soma F(N-1) + F(N-2) e armazena em $t3 ($t3 = $t3 + $t2)
+		move $t2, $t4 # Armazena o valor de F(N-1) em $t2, agora sendo F(N-2)
+		addi $t7, $t7, 1 # Soma +1 ao contador ($t7 = $t7 +1)
+		j fibonacci_calc # Chama a si mesmo de forma recursiva
+		
+	fibonacci_result:
+		li $v0, 4
+		la $a0, resultado
+		syscall
+
+		li $v0, 1
+		move $a0, $t3
+		syscall
+
+		li $v0, 4
+		la $a0, pula_linha
+		syscall
+
+	j main # Pula de volta para main
 
 enesimo_par:
 	# Imprimindo o menu
