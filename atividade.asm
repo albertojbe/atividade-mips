@@ -1,6 +1,8 @@
 .data
 	menu: .asciiz "\n1. Farenheit -> Celsius \n2. Fibonacci\n3. Enesimo par\n4. Sair\n\nDigite a opcao: "
 	farenheit_menu: .asciiz "\nDigite a temperatura em farenheit: "
+	fibonacci_menu: .asciiz "\nDigite o valor de N: "
+	par_menu: .asciiz "\nDigite um numero para saber seu enesimo par: "
 	resultado: .asciiz "Resultado: "
 	pula_linha: .asciiz "\n"
 	
@@ -9,7 +11,7 @@
 main:
 	
 	li $v0, 4 # Chamando função para imprimir string
-	la $a0, menu # Imprimindo o menu
+	la $a0, menu # Passando a váriavel menu da memoria para o registrador de argumento da função
 	syscall
 	
 	li $v0, 5 # Chamando função para ler inteiro
@@ -17,23 +19,24 @@ main:
 	move $t0, $v0 # Movendo o inteiro lido para o resgistrador $t0
 	
 	beq $t0, 1, farenheit # Se $t0 for igual a 1, então pula para a função farenheit
+	beq $t0, 2, fibonacci # Se $t0 for igual a 2, então pula para a função fibonacci
+	beq $t0, 3, enesimo_par # Se $t0 for igual a 3, então pula para a função enesimo par
 	beq $t0, 4, sair # Se $t0 for igual a 5, então pula para função sair, fechando o programa
 	
-	j main
+	j main # Pula de volta main caso não faça uma branch
 	
 	
 farenheit:
+	# Imprimindo o menu da função farenheit
 	li $v0, 4
-	la $a0, farenheit_menu # Imprimindo o menu da função farenheit
+	la $a0, farenheit_menu
 	syscall
-	
 	
 	li $v0, 6 # Lendo a temperatura em float que ficará salva no registrador $f0
 	syscall
-	mov.s $f1, $f0
+	mov.s $f1, $f0 # Passando o valor de $f0 para $f1
 
-	
-	# Armazenando os valores como inteiros e transferindo para os registradores de numeros flutuantes
+	# Armazenando valores como inteiros e transferindo para os registradores de numeros flutuantes
 	
 	li $t0, 32 # Inicializando valor inteiro no registrador $t0
 	mtc1 $t0, $f3 # Passando o valor do registrador $t0 para o registrador $f3 no Coproc 1
@@ -69,6 +72,50 @@ farenheit:
 	syscall
 	
 	j main # Pula de volta para a função main
+	
+fibonacci:
+	# Imprimindo o menu
+	li $v0, 4
+	la $a0, fibonacci_menu
+	syscall 
+	
+	# Lendo o inteiro de N
+	li $v0, 5
+	syscall
+	move $t1, $v0
+	
+	j main
+
+enesimo_par:
+	# Imprimindo o menu
+    	li $v0, 4
+    	la $a0, par_menu
+    	syscall
+
+    	# Lendo o número inteiro
+    	li $v0, 5
+   	syscall
+    	move $t0, $v0          # Passando o número lido em $t0
+
+    	# Multiplicando o número por 2 (deslocando os bits para a esquerda)
+    	sll $t1, $t0, 1        # $t1 = $t0 * 2
+
+    	# Imprimindo o texto "O dobro do número é: "
+    	li $v0, 4
+    	la $a0, resultado
+    	syscall
+
+    	# Imprimindo o número resultante
+    	li $v0, 1
+    	move $a0, $t1
+    	syscall
+
+    	# Pulando Linha
+    	li $v0, 4
+   	la $a0, pula_linha
+    	syscall
+
+	j main # Pula de volta pra main
 
 sair:
 	li $v0, 10
