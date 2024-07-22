@@ -6,7 +6,6 @@
 	resultado: .asciiz "Resultado: "
 	pula_linha: .asciiz "\n"
 	
-	
 .text
 main:
 	
@@ -24,7 +23,6 @@ main:
 	beq $t0, 4, sair # Se $t0 for igual a 5, então pula para função sair, fechando o programa
 	
 	j main # Pula de volta main caso não faça uma branch
-	
 	
 farenheit:
 	# Imprimindo o menu da função farenheit
@@ -97,6 +95,7 @@ fibonacci:
 		j fibonacci_calc # Chama a si mesmo de forma recursiva
 		
 	fibonacci_result:
+		# Imprimindo o resultado
 		li $v0, 4
 		la $a0, resultado
 		syscall
@@ -104,7 +103,8 @@ fibonacci:
 		li $v0, 1
 		move $a0, $t3
 		syscall
-
+		
+		# Pulando linha
 		li $v0, 4
 		la $a0, pula_linha
 		syscall
@@ -125,12 +125,11 @@ enesimo_par:
     	# Multiplicando o número por 2 (deslocando os bits para a esquerda)
     	sll $t1, $t0, 1        # $t1 = $t0 * 2
 
-    	# Imprimindo o texto "O dobro do número é: "
+    	# Imprimindo o resultado
     	li $v0, 4
     	la $a0, resultado
     	syscall
 
-    	# Imprimindo o número resultante
     	li $v0, 1
     	move $a0, $t1
     	syscall
